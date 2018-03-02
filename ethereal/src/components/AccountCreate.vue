@@ -6,13 +6,13 @@
           <main-menu class="column is-one-quarter" />
           <div class="column is-three-quarters">
             <div class="box">
-            <vue-form :state="formstate" @submit.prevent="onSubmitAccount">
+            <vue-form v-if="!accounted" :state="accountFormstate" @submit.prevent="onSubmitAccount">
             <p v-if="!wallet" class="help is-danger">You are not signed in. Sign in to <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">MetaMask</a> to use this app.</p>
               <div class="card-footer-item">
-                <button type="submit" :disabled="formstate.$invalid" class="button is-primary is-fullwidth subtitle">Create an Account Address</button>
+                <button type="submit" :disabled="accountFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Create an Account Address</button>
               </div>
             </vue-form>
-              <vue-form :state="formstate" @submit.prevent="onRegisterAccount">
+              <vue-form :state="registerFormstate" @submit.prevent="onRegisterAccount">
                 <div class="columns">
                   <div class="column">
                     <div class="field">
@@ -36,10 +36,13 @@
                     </div>
                   </div>
                 </div>
-                <p class="help" v-model="rgError"></p>
                 <div class="card-footer-item">
-                  <button type="submit" :disabled="formstate.$invalid" class="button is-primary is-fullwidth subtitle">Register</button>
+                  <button type="submit" :disabled="registerFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Register</button>
                 </div>
+                <p class="help" id="rgReturn"></p>
+                </vue-form>
+
+                <vue-form :state="registerFormstate" @submit.prevent="onSubmitContract">
                 <div class="field">
                   <validate>
                     <label class="label">Enter your agreement</label>
@@ -63,7 +66,7 @@
                     </div>
                   </article>
                   <div class="card-footer-item">
-                    <button type="submit" :disabled="formstate.$invalid" class="button is-primary is-fullwidth subtitle">Store Contract</button>
+                    <button type="submit" :disabled="registerFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Store Contract</button>
                   </div>
               </vue-form>
             </div>
@@ -76,12 +79,13 @@
 <script>
 import MainMenu from './MainMenu'
 import TopNav from './TopNav.vue'
-import { createContractInstance, createAccountContractInstance } from '../web3Service'
+import { getRegistryContractInstance, createContractInstance, createAccountContractInstance } from '../web3Service'
 
 export default {
   data() {
     return {
-      formstate: {},
+      accountFormstate: {},
+      registerFormstate: {},
       account: {
         name: '',
         address: '',
@@ -90,7 +94,9 @@ export default {
         witness: this.$store.state.defaultEthWallet
       },
       wallet: this.$store.state.defaultEthWallet,
-      rgError: ''
+      rgReturn: '',
+      accounted: '',
+      registered: ''
     }
   },
   methods: {
@@ -102,9 +108,15 @@ export default {
     async onSubmitAccount() {
       const accountContract = await createAccountContractInstance(this.$data.wallet)
       this.$data.account.address = accountContract.address
+      this.$data.accounted = 'true'
     },
     async onRegisterAccount() {
-      
+      const registryContract = await getRegistryContractInstance()
+      let tx = registryContract.register.sendTransaction(this.$data.account.name, this.$data.account.address)
+      console.log(tx)
+      console.log('Tx: ${tx}')
+      this.$data.rgReturn = 'Tx: ${tx}'
+      this.$data.registered = 'true'
     }
   },
   components: {

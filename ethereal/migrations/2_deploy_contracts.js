@@ -1,5 +1,5 @@
-var WitnessContract = artifacts.require('../contracts/WitnessContract.sol')
+var RegistryContract = artifacts.require('../contracts/AppRegistry.sol')
 
 module.exports = function(deployer) {
-  deployer.deploy(WitnessContract,"My contract","My Terms")
+  deployer.deploy(RegistryContract)
 }

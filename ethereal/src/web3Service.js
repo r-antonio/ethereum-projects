@@ -3,6 +3,7 @@ import Web3 from 'web3'
 
 import witnessContractJSON from '../build/contracts/WitnessContract.json'
 import accountContractJSON from '../build/contracts/UserAccount.json'
+import registryContractJSON from '../build/contracts/AppRegistry.json'
 
 if (typeof web3 !== 'undefined') {
   web3 = new Web3(web3.currentProvider)
@@ -20,8 +21,14 @@ const AccountContract = contract({
   binary: accountContractJSON.bytecode
 })
 
+const RegistryContract = contract({
+  abi: registryContractJSON.abi,
+  binary: registryContractJSON.bytecode
+})
+
 WitnessContract.setProvider(web3.currentProvider)
 AccountContract.setProvider(web3.currentProvider)
+RegistryContract.setProvider(web3.currentProvider)
 
 const getNetIdString = async () => {
   const id = await web3.eth.net.getId()
@@ -95,4 +102,8 @@ const createAccountContractInstance = async addr => {
   return await AccountContract.at(createdContract.options.address)
 }
 
-export { createAccountContractInstance, createContractInstance, getDefaultEthWallet, getNetIdString }
+const getRegistryContractInstance = async () => {
+  return await RegistryContract.at('0xb8751a5d0db94cc13bdbea5ea096c77717a99ee1')
+}
+
+export { getRegistryContractInstance, createAccountContractInstance, createContractInstance, getDefaultEthWallet, getNetIdString }
