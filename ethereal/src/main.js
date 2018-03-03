@@ -4,15 +4,17 @@ import App from './App'
 import router from './router'
 import store from './store'
 import * as OfflinePluginRuntime from 'offline-plugin/runtime'
-import { getDefaultEthWallet, getNetIdString } from './web3Service'
+import { getRegisteredAddress, getDefaultEthWallet, getNetIdString } from './web3Service'
 Vue.config.productionTip = false
 Vue.use(VueForm)
 ;(async () => {
   try {
     const defaultEthWallet = await getDefaultEthWallet()
     const netIdString = await getNetIdString()
+    const accountAddress = await getRegisteredAddress()
     store.commit('setNetworkId', netIdString)
     store.commit('setDefaultEthWallet', defaultEthWallet)
+    store.commit('setRegisteredAddress', accountAddress)
   } catch (e) {
     // TODO: Handle error
     // eslint-disable-next-line

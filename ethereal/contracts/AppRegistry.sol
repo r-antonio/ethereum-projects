@@ -58,6 +58,10 @@ contract AppRegistry {
 		return _accountNameToAccountAddress[name];
 	}
 
+	function getAccountAddressOfAddress(address addr) constant public returns (address accountAddress) {
+		return _addressToAccountAddress[addr];
+	}
+
 	function getNameOfAccountAddress(address addr) constant public returns (string name) {
 		return _accountAddressToAccountName[addr];
 	}

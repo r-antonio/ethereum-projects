@@ -22,6 +22,8 @@
       </p>
       <ul class="menu-list">
         <li><router-link exact to="/account">Create an Account</router-link></li>
+        <li><router-link exact to="/send">Send Post</router-link></li>
+        <li><router-link exact to="/posts">View Posts</router-link></li>
         <li><router-link exact to="/contracts">View Stored Contracts</router-link></li>
         <li><router-link exact to="/">Home</router-link></li>
       </ul>

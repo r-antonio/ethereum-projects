@@ -58,6 +58,19 @@ const getDefaultEthWallet = () =>
     })
   })
 
+const getRegisteredAddress = async () => {
+  const wallet = await getDefaultEthWallet()
+  const registry = await getRegistryContractInstance()
+  const result = await registry.getAccountAddressOfAddress.call(wallet)
+  return result
+}
+
+const getRegisteredAddressOfName = async name => {
+  const registry = await getRegistryContractInstance()
+  const result = await registry.getAccountAddressOfName.call(name)
+  return result
+}
+
 const createContractInstance = async c => {
   // https://github.com/trufflesuite/truffle-contract/issues/70
   const newContract = new web3.eth.Contract(witnessContractJSON.abi)
@@ -103,7 +116,7 @@ const createAccountContractInstance = async addr => {
 }
 
 const getRegistryContractInstance = async () => {
-  return await RegistryContract.at('0xb8751a5d0db94cc13bdbea5ea096c77717a99ee1')
+  return await RegistryContract.at('0x345ca3e014aaf5dca488057592ee47305d9b3e10')
 }
 
-export { getRegistryContractInstance, createAccountContractInstance, createContractInstance, getDefaultEthWallet, getNetIdString }
+export { getRegisteredAddressOfName, getRegisteredAddress, getRegistryContractInstance, createAccountContractInstance, createContractInstance, getDefaultEthWallet, getNetIdString }

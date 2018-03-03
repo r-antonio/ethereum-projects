@@ -6,7 +6,9 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     netIdString: '',
-    defaultEthWallet: ''
+    defaultEthWallet: '',
+    hasAccount: '',
+    registeredAddress: ''
   },
   getters: {},
   mutations: {
@@ -15,6 +17,12 @@ const store = new Vuex.Store({
     },
     setDefaultEthWallet(state, walletAddress) {
       state.defaultEthWallet = walletAddress
+    },
+    setHasAccount(state, address) {
+      state.hasAccount = address
+    },
+    setRegisteredAddress(state, address) {
+      if (address != 0x0) state.registeredAddress = address
     }
   },
   actions: {}

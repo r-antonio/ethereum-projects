@@ -14,7 +14,7 @@
                     <div class="buttons">
                         <a class="button" target="_blank" href="https://github.com/redacademy/vue-ethereum-ipfs">Github Repo</a>
                         &nbsp;
-                        <router-link to="/contract"><a class="button is-info" href="">Go to App</a></router-link>
+                        <router-link to="/account"><a class="button is-info" href="">Go to App</a></router-link>
                     </div>
                 </div>
                 <div class="column">
