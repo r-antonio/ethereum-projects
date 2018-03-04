@@ -1,7 +1,6 @@
 import contract from 'truffle-contract'
 import Web3 from 'web3'
 
-import witnessContractJSON from '../build/contracts/WitnessContract.json'
 import accountContractJSON from '../build/contracts/UserAccount.json'
 import registryContractJSON from '../build/contracts/AppRegistry.json'
 
@@ -10,11 +9,6 @@ if (typeof web3 !== 'undefined') {
 } else {
   web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 }
-
-const WitnessContract = contract({
-  abi: witnessContractJSON.abi,
-  binary: witnessContractJSON.bytecode
-})
 
 const AccountContract = contract({
   abi: accountContractJSON.abi,
@@ -26,7 +20,6 @@ const RegistryContract = contract({
   binary: registryContractJSON.bytecode
 })
 
-WitnessContract.setProvider(web3.currentProvider)
 AccountContract.setProvider(web3.currentProvider)
 RegistryContract.setProvider(web3.currentProvider)
 
@@ -67,33 +60,35 @@ const getRegisteredAddress = async () => {
 
 const getRegisteredAddressOfName = async name => {
   const registry = await getRegistryContractInstance()
-  const result = await registry.getAccountAddressOfName.call(name)
-  return result
+  return await registry.getAccountAddressOfName.call(name)
 }
 
-const createContractInstance = async c => {
-  // https://github.com/trufflesuite/truffle-contract/issues/70
-  const newContract = new web3.eth.Contract(witnessContractJSON.abi)
-
-  const createdContract = await newContract
-    .deploy({
-      data: witnessContractJSON.bytecode,
-
-      // Contract constructor arguments
-      arguments: [c.name, c.terms]
-    })
-    .send({
-      from: c.witness,
-
-      // Gas.
-      gas: 1500000,
-      gasPrice: '20000000000000'
-    })
-
-  return await WitnessContract.at(createdContract.options.address)
+const getRegisteredAddressOfAddress = async addr => {
+  const registry = await getRegistryContractInstance()
+  return await registry.getAccountAddressOfAddress.call(addr)
 }
 
-const createAccountContractInstance = async addr => {
+const createPost = async p => {
+  const account = await getAccountContractInstance(p.address)
+  return await account.post.sendTransaction(p.message, p.dataType, p.data, {from:p.wallet,gas:1500000,gasPrice:2000000000})
+}
+
+const getLastPost = async address => {
+  const account = await getAccountContractInstance(address)
+  return await account.getLastPost.call()
+}
+
+const getPost = async (address, id) => {
+  const account = await getAccountContractInstance(address)
+  return await account.getPost.call(id)
+}
+
+const getNumberOfPosts = async addr => {
+  const account = await getAccountContractInstance(addr)
+  return await account.getNumberOfPosts.call()
+}
+
+const createAccountContractInstance = async (addr, username) => {
   // https://github.com/trufflesuite/truffle-contract/issues/70
   const newContract = new web3.eth.Contract(accountContractJSON.abi)
 
@@ -102,21 +97,25 @@ const createAccountContractInstance = async addr => {
       data: accountContractJSON.bytecode,
 
       // Contract constructor arguments
-      arguments: []
+      arguments: [username]
     })
     .send({
       from: addr,
 
       // Gas.
       gas: 1500000,
-      gasPrice: '20000000000000'
+      gasPrice: '2000000000'
     })
 
   return await AccountContract.at(createdContract.options.address)
 }
 
 const getRegistryContractInstance = async () => {
-  return await RegistryContract.at('0x345ca3e014aaf5dca488057592ee47305d9b3e10')
+  return await RegistryContract.at('0xace1d3a9caa26b2d18edffcd2475e0ce2da2c8c0')
 }
 
-export { getRegisteredAddressOfName, getRegisteredAddress, getRegistryContractInstance, createAccountContractInstance, createContractInstance, getDefaultEthWallet, getNetIdString }
+const getAccountContractInstance = async addr => {
+  return await AccountContract.at(addr)
+}
+
+export { getPost, getLastPost, getNumberOfPosts, getRegisteredAddressOfAddress, createPost, getAccountContractInstance, getRegisteredAddressOfName, getRegisteredAddress, getRegistryContractInstance, createAccountContractInstance, getDefaultEthWallet, getNetIdString }

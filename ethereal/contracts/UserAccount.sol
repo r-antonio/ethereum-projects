@@ -5,8 +5,10 @@ contract UserAccount {
 	mapping (uint => Post) _posts;
 	uint public _numberOfPosts;
 	address public _adminAddress;
+	string public _name;
 	uint constant MAX_DATA_SIZE = 160;
 	uint constant MAX_POST_SIZE = 240;
+	uint constant MAX_NAME_SIZE = 64;
 
 	// data structure of a single post
 	struct Post {
@@ -22,7 +24,9 @@ contract UserAccount {
 		_;
 	}
 
-	function UserAccount() public {
+	function UserAccount(string name) public {
+		require(bytes(name).length <= MAX_NAME_SIZE);
+		_name = name;
 		_numberOfPosts = 0;
 		_adminAddress = msg.sender;
 	}
@@ -32,8 +36,8 @@ contract UserAccount {
 	function post(string message, uint dataType, string data) onlyAdmin public {
 		require(bytes(message).length <= MAX_POST_SIZE);
 		require(bytes(data).length <= MAX_DATA_SIZE);
-		_posts[_numberOfPosts].timestamp = now;
 		_posts[_numberOfPosts].lastEdited = now;
+		_posts[_numberOfPosts].timestamp = now;
 		_posts[_numberOfPosts].message = message;
 		_posts[_numberOfPosts].dataType = dataType;
 		_posts[_numberOfPosts].data = data;
@@ -47,8 +51,13 @@ contract UserAccount {
 		_posts[postId].lastEdited = now;
 	}
 
+	function editName(string name) onlyAdmin public {
+		require(bytes(name).length <= MAX_NAME_SIZE);
+		_name = name;
+	}
+
 	function getPost(uint postId) constant public returns (string message, uint timestamp, uint dataType, string data, uint lastEdited) {
-		require(postId > 0 && postId < _numberOfPosts);
+		require(postId >= 0 && postId < _numberOfPosts);
 		message = _posts[postId].message;
 		timestamp = _posts[postId].timestamp;
 		dataType = _posts[postId].dataType;
@@ -67,6 +76,10 @@ contract UserAccount {
 
 	function getOwnerAddress() constant public returns (address adminAddress) {
 		return _adminAddress;
+	}
+
+	function getName() constant public returns (string name) {
+		return _name;
 	}
 
 	function getNumberOfPosts() constant public returns (uint numberOfPosts) {

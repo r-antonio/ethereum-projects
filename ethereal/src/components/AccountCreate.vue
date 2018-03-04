@@ -8,8 +8,16 @@
             <div class="box">
             <vue-form v-if="!accounted" :state="accountFormstate" @submit.prevent="onSubmitAccount">
             <p v-if="!wallet" class="help is-danger">You are not signed in. Sign in to <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">MetaMask</a> to use this app.</p>
+              <div class="field">
+                <validate>
+                  <label class="label">Account Username</label>
+                  <div class="control">
+                    <input v-model="username" name="username" required class="input" type="text" placeholder="Enter your account username">
+                  </div>
+                </validate>
+              </div>
               <div class="card-footer-item">
-                <button type="submit" :disabled="accountFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Create an Account Address</button>
+                <button type="submit" :disabled="accountFormstate.$invalid" class="button is-link is-fullwidth subtitle">Create an Account Address</button>
               </div>
             </vue-form>
             <vue-form :state="registerFormstate" @submit.prevent="onRegisterAccount">
@@ -17,9 +25,9 @@
                 <div class="column">
                   <div class="field">
                     <validate>
-                      <label class="label">Username</label>
+                      <label class="label">Registry Username</label>
                       <div class="control">
-                        <input v-model="account.name" name="name" required class="input" type="text" placeholder="Enter your account username">
+                        <input v-model="account.name" name="name" required class="input" type="text" placeholder="Enter your registry account username">
                       </div>
                     </validate>
                   </div>
@@ -37,37 +45,9 @@
                 </div>
               </div>
               <div class="card-footer-item">
-                <button type="submit" :disabled="registerFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Register</button>
+                <button type="submit" :disabled="registerFormstate.$invalid" class="button is-link is-fullwidth subtitle">Register</button>
               </div>
               <p class="help">{{ rgReturn }}</p>
-            </vue-form>
-
-            <vue-form v-if='false' :state="registerFormstate" @submit.prevent="onSubmitContract">
-              <div class="field">
-                <validate>
-                  <label class="label">Enter your agreement</label>
-                  <div class="control">
-                    <textarea v-model="account.terms" name="terms" required class="textarea" type="text" placeholder="..."></textarea>
-                  </div>
-                </validate>
-              </div>
-              <div class="field">
-                <validate>
-                  <label class="label">Witness (You)</label>
-                  <div class="control">
-                    <input v-model="account.witness" name="witness" :disabled="!account.witness" :class="{ ['is-danger']: !account.witness }" required class="input" type="text" placeholder="This input will autofill with your Metamask wallet address">
-                    <p v-if="!account.witness" class="help is-danger">You are not signed in. Sign in to <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">MetaMask</a> to use this app.</p>
-                  </div>
-                </validate>
-              </div>
-                <article class="message is-warning">
-                  <div class="message-body">
-                    Submitting this contract adds a record to the Ethereum Blockchain with the above information.
-                  </div>
-                </article>
-                <div class="card-footer-item">
-                  <button type="submit" :disabled="registerFormstate.$invalid" class="button is-primary is-fullwidth subtitle">Store Contract</button>
-                </div>
             </vue-form>
             </div>
           </div>
@@ -79,13 +59,14 @@
 <script>
 import MainMenu from './MainMenu'
 import TopNav from './TopNav.vue'
-import { getRegistryContractInstance, createContractInstance, createAccountContractInstance } from '../web3Service'
+import { getRegistryContractInstance, createAccountContractInstance } from '../web3Service'
 
 export default {
   data() {
     return {
       accountFormstate: {},
       registerFormstate: {},
+      username: '',
       account: {
         name: '',
         address: '',
@@ -100,14 +81,9 @@ export default {
     }
   },
   methods: {
-    async onSubmitContract() {
-      // TODO: validation
-      const witnessContract = await createContractInstance(this.$data.contract)
-      console.log('Contract was created:', witnessContract.contract_name())
-    },
     async onSubmitAccount() {
       console.log(this.$store.state.hasAccount)
-      const accountContract = await createAccountContractInstance(this.$data.wallet)
+      const accountContract = await createAccountContractInstance(this.$data.wallet, this.$data.username)
       this.$data.account.address = accountContract.address
       this.$store.commit('setHasAccount', accountContract.address)
       console.log(this.$store.state.hasAccount)
@@ -118,7 +94,7 @@ export default {
       const registryContract = await getRegistryContractInstance()
       const tx = await registryContract.register.sendTransaction(this.$data.account.name, this.$data.account.address, {from:this.$data.wallet,gas:1500000,gasPrice:2000000000})
       console.log(tx)
-      this.$data.rgReturn = 'Tx: '+tx.value
+      this.$data.rgReturn = 'Tx: '+tx
       //this.$data.registered = 'true'
     }
   },

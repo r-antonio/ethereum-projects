@@ -3,9 +3,9 @@ import Router from 'vue-router'
 
 import Hello from '../components/Hello.vue'
 import AccountCreate from '../components/AccountCreate.vue'
-import ContractView from '../components/ContractView.vue'
 import ViewPosts from '../components/ViewPosts.vue'
 import SendPost from '../components/SendPost.vue'
+import LookupAccount from '../components/LookupAccount.vue'
 
 Vue.use(Router)
 
@@ -27,6 +27,12 @@ export default new Router({
       }
     },
     {
+      path: '/lookup',
+      components: {
+        default: LookupAccount
+      }
+    },
+    {
       path: '/posts',
       components: {
         default: ViewPosts
@@ -36,12 +42,6 @@ export default new Router({
       path: '/send',
       components: {
         default: SendPost
-      }
-    },
-    {
-      path: '/contracts',
-      components: {
-        default: ContractView
       }
     }
   ]
