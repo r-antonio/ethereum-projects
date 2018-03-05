@@ -78,6 +78,11 @@ const getLastPost = async address => {
   return await account.getLastPost.call()
 }
 
+const getUsername = async address => {
+  const account = await getAccountContractInstance(address)
+  return await account.getName.call()
+}
+
 const getPost = async (address, id) => {
   const account = await getAccountContractInstance(address)
   return await account.getPost.call(id)
@@ -111,11 +116,11 @@ const createAccountContractInstance = async (addr, username) => {
 }
 
 const getRegistryContractInstance = async () => {
-  return await RegistryContract.at('0xace1d3a9caa26b2d18edffcd2475e0ce2da2c8c0')
+  return await RegistryContract.at('0x02856c9796732cfd5f35e523aff542c2c30ca9b1')
 }
 
 const getAccountContractInstance = async addr => {
   return await AccountContract.at(addr)
 }
 
-export { getPost, getLastPost, getNumberOfPosts, getRegisteredAddressOfAddress, createPost, getAccountContractInstance, getRegisteredAddressOfName, getRegisteredAddress, getRegistryContractInstance, createAccountContractInstance, getDefaultEthWallet, getNetIdString }
+export { getUsername, getPost, getLastPost, getNumberOfPosts, getRegisteredAddressOfAddress, createPost, getAccountContractInstance, getRegisteredAddressOfName, getRegisteredAddress, getRegistryContractInstance, createAccountContractInstance, getDefaultEthWallet, getNetIdString }

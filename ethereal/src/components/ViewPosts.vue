@@ -16,7 +16,7 @@
                 </validate>
               </div>
               <div class="card-footer-item">
-                <button type="submit" :disabled="formstate.$invalid" class="button is-link is-fullwidth subtitle">See Posts</button>
+                <button type="submit" :disabled="formstate.$invalid || (lastUser == account.name)" class="button is-link is-fullwidth subtitle">See Posts</button>
               </div>
               <p class="help">{{ sReturn }}</p>
             </vue-form>
@@ -27,30 +27,17 @@
                 <article class="media">
                   <div class="media-left">
                     <figure class="image is-64x64">
-                      <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
+                      <img v-bind:src="account.icon" alt="Address Icon">
                     </figure>
                   </div>
                   <div class="media-content">
                     <div class="content">
                       <p>
-                        <strong>John Smith</strong> <small>@{{ account.name }}</small> <small>{{ getTime(post.timestamp) }}</small>
+                        <strong>{{ account.showName }}</strong> <small>@{{ account.name }}</small> <small>{{ getTime(post.timestamp) }}</small> <small v-if="post.lastEdited > post.timestamp"> - Edited</small>
                         <br>
                         {{ post.message }}
                       </p>
                     </div>
-                    <nav class="level is-mobile">
-                      <div class="level-left">
-                        <a class="level-item">
-                          <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                        </a>
-                        <a class="level-item">
-                          <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                        </a>
-                        <a class="level-item">
-                          <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                        </a>
-                      </div>
-                    </nav>
                   </div>
                 </article>
               </div>
@@ -66,17 +53,21 @@
 <script>
 import MainMenu from './MainMenu'
 import TopNav from './TopNav.vue'
-import { getPost, getLastPost, getRegisteredAddressOfName } from '../web3Service'
+const blockies = require('ethereum-blockies-png')
+import { getUsername, getPost, getLastPost, getRegisteredAddressOfName } from '../web3Service'
 
 export default {
   data() {
     return {
       formstate: {},
       account: {
+        icon: '',
         name: '',
         address: '',
-        lastId: 0
+        lastId: 0,
+        showName: ''
       },
+      lastUser: '',
       posts: [],
       wallet: this.$store.state.defaultEthWallet,
       sReturn: ''
@@ -119,12 +110,18 @@ export default {
       console.log(this.$data.posts)
     },
     async onSubmitSearch() {
+      this.$data.posts = []
+      this.$data.lastUser = this.$data.account.name
       const result = await getRegisteredAddressOfName(this.$data.account.name)
       this.$data.account.address = result
+      this.$data.account.icon = blockies.createDataURL({ seed: result })
+      console.log(this.$data.account.icon)
       const lastPost = await getLastPost(this.$data.account.address)
       this.$data.account.lastId = lastPost[5].c[0]
       const post = this.buildPost(lastPost)
       this.$data.posts.push(post)
+      const sName = await getUsername(this.$data.account.address)
+      this.$data.account.showName = sName
       this.getPosts(true)
     }
   },

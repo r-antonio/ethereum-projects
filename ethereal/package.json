@@ -24,7 +24,8 @@
     "vuex": "^3.0.1",
     "web3": "^1.0.0-beta.30",
     "websocket": "^1.0.25",
-    "zeppelin-solidity": "^1.7.0"
+    "zeppelin-solidity": "^1.7.0",
+    "ethereum-blockies-png": "^0.1.2"
   },
   "devDependencies": {
     "@vue/eslint-config-prettier": "^3.0.0-beta.1",
