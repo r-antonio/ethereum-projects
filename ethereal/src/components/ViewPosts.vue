@@ -37,6 +37,22 @@
                         <br>
                         {{ post.message }}
                       </p>
+                      <link-prevue v-if="post.dataType == 1" v-bind:url="post.data">
+                        <template slot-scope="props">
+                          <br>
+                          <div class="card-image">
+                            <figure class="image" style="max-width:480px">
+                              <img :src="props.img" :alt="props.title">
+                            </figure>
+                          </div>
+                          <div class="card-content">
+                            <a :href="props.url"><p class="title is-5">{{ props.title }}</p></a>
+                            <p>
+                              {{ props.description }}
+                            </p>
+                          </div>
+                        </template>
+                      </link-prevue>
                     </div>
                   </div>
                 </article>
@@ -53,7 +69,10 @@
 <script>
 import MainMenu from './MainMenu'
 import TopNav from './TopNav.vue'
+
 const blockies = require('ethereum-blockies-png')
+import LinkPrevue from 'link-prevue'
+
 import { getUsername, getPost, getLastPost, getRegisteredAddressOfName } from '../web3Service'
 
 export default {
@@ -127,7 +146,8 @@ export default {
   },
   components: {
     MainMenu,
-    TopNav
+    TopNav,
+    LinkPrevue
   }
 }
 </script>

@@ -116,7 +116,7 @@ const createAccountContractInstance = async (addr, username) => {
 }
 
 const getRegistryContractInstance = async () => {
-  return await RegistryContract.at('0x02856c9796732cfd5f35e523aff542c2c30ca9b1')
+  return await RegistryContract.at('0xc94bb5d603ae9b6c148090f15167f22f10381720')
 }
 
 const getAccountContractInstance = async addr => {
